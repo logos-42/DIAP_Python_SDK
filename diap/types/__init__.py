@@ -23,6 +23,7 @@ from .zkp_types import (
     ProofInputs,
     ProofResult,
     VerificationKey,
+    ZKPProof,
 )
 
 from .errors import (
@@ -56,6 +57,7 @@ __all__ = [
     "ProofInputs",
     "ProofResult",
     "VerificationKey",
+    "ZKPProof",
     "DIAPError",
     "KeyManagerError",
     "DIDBuilderError",

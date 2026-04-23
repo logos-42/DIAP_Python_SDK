@@ -12,6 +12,18 @@ def bytes_to_multibase(data: bytes) -> str:
     return MULTIBASE_BASE58_BTC + base58.b58encode(data).decode()
 
 
+def base58_encode(data: bytes) -> str:
+    import base58
+
+    return base58.b58encode(data).decode()
+
+
+def base58_decode(data: str) -> bytes:
+    import base58
+
+    return base58.b58decode(data)
+
+
 def multibase_to_bytes(data: str) -> bytes:
     if data.startswith(MULTIBASE_BASE58_BTC):
         import base58

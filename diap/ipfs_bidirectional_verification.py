@@ -1,6 +1,7 @@
 import asyncio
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timedelta
+from dataclasses import dataclass
 
 from .types.errors import VerificationError
 from .utils.crypto import sha256_hash, generate_random_bytes
@@ -230,9 +231,7 @@ class IPFSBidirectionalVerifier:
         expired = [
             cid
             for cid, c in self._challenges.items()
-            if datetime.fromisoformat(c.expires_at.replace("Z", "+00:00")).replace(
-                tzinfo=None
-            )
+            if datetime.fromisoformat(c.expires_at.replace("Z", "+00:00")).replace(tzinfo=None)
             < now
         ]
 

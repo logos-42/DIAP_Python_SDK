@@ -2,9 +2,9 @@ from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from datetime import datetime
 
-from ..types.zkp_types import NoirProverInputs, NoirProofResult, ProofResult
-from ..types.errors import ZKPError
-from ..utils.logger import get_logger
+from .types.zkp_types import NoirProverInputs, NoirProofResult, ProofResult
+from .types.errors import ZKPError
+from .utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -73,9 +73,7 @@ class NoirZKPManager:
 
         result = self._backend.generate_proof(inputs)
 
-        generation_time_ms = int(
-            (datetime.utcnow() - start_time).total_seconds() * 1000
-        )
+        generation_time_ms = int((datetime.utcnow() - start_time).total_seconds() * 1000)
 
         return ProofResult(
             proof=result.proof,

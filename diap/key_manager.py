@@ -147,9 +147,9 @@ class KeyManager:
                 salt = generate_random_bytes(16)
                 key = KeyManager._derive_key(password, salt)
                 nonce = generate_random_bytes(12)
-                encrypted, _, tag = aes_gcm_encrypt(key, json_data.encode(), nonce)
+                encrypted, _, _ = aes_gcm_encrypt(key, json_data.encode(), nonce)
 
-                combined = salt + nonce + tag + encrypted
+                combined = salt + nonce + encrypted
                 encrypted_data = base58_encode(combined)
             else:
                 encrypted_data = base58_encode(json_data.encode())
@@ -169,8 +169,7 @@ class KeyManager:
             if password:
                 salt = encrypted_buffer[:16]
                 nonce = encrypted_buffer[16:28]
-                tag = encrypted_buffer[28:44]
-                ciphertext = encrypted_buffer[44:]
+                ciphertext = encrypted_buffer[28:]
 
                 key = KeyManager._derive_key(password, salt)
                 decrypted = aes_gcm_decrypt(ciphertext, key, nonce)

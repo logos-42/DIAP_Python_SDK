@@ -28,7 +28,7 @@ setup(
     python_requires=">=3.10",
     install_requires=[
         "aiohttp>=3.9.0",
-        "ipfshttpclient>=0.8.0",
+        "ipfshttpclient>=0.8.0a2",
         "cryptography>=41.0.0",
         "cachetools>=5.3.0",
         "python-dotenv>=1.0.0",
