@@ -22,8 +22,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
-        "Topic :: Security :: Cryptography",
-        "Topic :: Internet :: P2P",
     ],
     python_requires=">=3.10",
     install_requires=[
