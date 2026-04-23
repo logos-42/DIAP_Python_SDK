@@ -1,4 +1,4 @@
-from .key_manager import KeyManager
+from .key_manager import KeyManager, KeyManagerInstance
 
 from .config_manager import ConfigManager, SDKConfig, IPFSConfig, P2PConfig, ZKPConfig
 
@@ -41,7 +41,13 @@ from .pubsub_authenticator import PubSubAuthenticator, PubSubMessage, PubSubTopi
 
 from .nonce_manager import NonceManager, DistributedNonceManager
 
-from .encrypted_peer_id import EncryptedPeerIDManager, EncryptedPeerID
+from .encrypted_peer_id import (
+    EncryptedPeerID,
+    encrypt_peer_id,
+    decrypt_peer_id_with_secret,
+    verify_peer_id_signature,
+    verify_encrypted_peer_id_ownership,
+)
 
 from .encrypted_iroh_id import EncryptedIrohIDManager, EncryptedIrohID
 
@@ -52,7 +58,16 @@ from .iroh_node import IrohNode, IrohNodeConfig, IrohNodeStatus
 from .ipfs_bidirectional_verification import (
     IPFSBidirectionalVerifier,
     VerificationChallenge,
-    VerificationResult as BidirectionalVerificationResult,
+)
+
+from .p2p import (
+    HyperswarmCommunicator,
+    create_hyperswarm_communicator,
+    create_topic,
+    P2PMessageType,
+    P2PConnection,
+    P2PNodeAddr,
+    P2PMessage,
 )
 
 from .types import (
@@ -84,6 +99,7 @@ __version__ = "0.1.0"
 
 __all__ = [
     "KeyManager",
+    "KeyManagerInstance",
     "ConfigManager",
     "SDKConfig",
     "IPFSConfig",
@@ -116,8 +132,11 @@ __all__ = [
     "PubSubTopic",
     "NonceManager",
     "DistributedNonceManager",
-    "EncryptedPeerIDManager",
     "EncryptedPeerID",
+    "encrypt_peer_id",
+    "decrypt_peer_id_with_secret",
+    "verify_peer_id_signature",
+    "verify_encrypted_peer_id_ownership",
     "EncryptedIrohIDManager",
     "EncryptedIrohID",
     "IrohCommunicator",
@@ -128,6 +147,13 @@ __all__ = [
     "IrohNodeStatus",
     "IPFSBidirectionalVerifier",
     "VerificationChallenge",
+    "HyperswarmCommunicator",
+    "create_hyperswarm_communicator",
+    "create_topic",
+    "P2PMessageType",
+    "P2PConnection",
+    "P2PNodeAddr",
+    "P2PMessage",
     "KeyPair",
     "KeyBackup",
     "KeyStoreConfig",

@@ -41,6 +41,16 @@ def bytes_to_hex(data: bytes) -> str:
     return data.hex()
 
 
+def encode_hex(data: bytes) -> str:
+    return data.hex()
+
+
+def decode_hex(data: Union[str, bytes]) -> bytes:
+    if isinstance(data, str):
+        return bytes.fromhex(data)
+    return data
+
+
 def encode_uint64(value: int) -> bytes:
     result = []
     while value > 0:

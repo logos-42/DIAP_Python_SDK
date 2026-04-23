@@ -16,38 +16,50 @@ from diap import (
 
 
 class TestKeyManager:
-    def test_generate_key_pair(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+    def test_generate(self):
+        key_pair = KeyManager.generate()
 
         assert key_pair.private_key is not None
         assert key_pair.public_key is not None
         assert key_pair.did.startswith("did:key:")
 
     def test_sign_and_verify(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+        key_pair = KeyManager.generate()
 
         message = b"test message"
-        signature = km.sign(key_pair, message)
+        signature = KeyManager.sign(key_pair, message)
 
-        assert km.verify(key_pair, message, signature)
+        assert KeyManager.verify(key_pair, message, signature)
 
     def test_wrong_signature_fails(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+        key_pair = KeyManager.generate()
 
         message = b"test message"
-        signature = km.sign(key_pair, message)
+        signature = KeyManager.sign(key_pair, message)
 
         wrong_message = b"wrong message"
-        assert not km.verify(key_pair, wrong_message, signature)
+        assert not KeyManager.verify(key_pair, wrong_message, signature)
+
+    def test_from_private_key(self):
+        key_pair = KeyManager.generate()
+        key_pair2 = KeyManager.from_private_key(key_pair.private_key)
+
+        assert key_pair.did == key_pair2.did
+        assert key_pair.public_key == key_pair2.public_key
+
+    def test_export_and_import_backup(self):
+        key_pair = KeyManager.generate()
+
+        backup = KeyManager.export_backup(key_pair, password="testpassword")
+        assert backup.encrypted_data is not None
+
+        imported = KeyManager.import_from_backup(backup, password="testpassword")
+        assert imported.did == key_pair.did
 
 
 class TestDIDBuilder:
     def test_create_did_document(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+        key_pair = KeyManager.generate()
         builder = DIDBuilder()
 
         doc = builder.create_did_document(key_pair)
@@ -72,8 +84,7 @@ class TestDIDBuilder:
 
 class TestDIDCache:
     def test_cache_set_and_get(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+        key_pair = KeyManager.generate()
         builder = DIDBuilder()
         doc = builder.create_did_document(key_pair)
 
@@ -90,8 +101,7 @@ class TestDIDCache:
         assert result is None
 
     def test_cache_invalidate(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
+        key_pair = KeyManager.generate()
         builder = DIDBuilder()
         doc = builder.create_did_document(key_pair)
 
@@ -167,9 +177,8 @@ class TestNonceManager:
 
 class TestAgentAuthManager:
     def test_create_agent(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
-        auth_mgr = AgentAuthManager(key_manager=km)
+        key_pair = KeyManager.generate()
+        auth_mgr = AgentAuthManager(key_manager=None)
 
         agent = auth_mgr.create_agent("TestAgent", key_pair)
 
@@ -177,9 +186,8 @@ class TestAgentAuthManager:
         assert agent.name == "TestAgent"
 
     def test_duplicate_agent_fails(self):
-        km = KeyManager()
-        key_pair = km.generate_key_pair()
-        auth_mgr = AgentAuthManager(key_manager=km)
+        key_pair = KeyManager.generate()
+        auth_mgr = AgentAuthManager(key_manager=None)
 
         auth_mgr.create_agent("TestAgent", key_pair)
 

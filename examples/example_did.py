@@ -1,7 +1,7 @@
 # Example: DID Document Creation
 # Demonstrates creating and managing W3C DID Documents
 
-from diap import KeyManager, DIDBuilder, DIDCache, KeyPair
+from diap import KeyManager, DIDBuilder, DIDCache
 from diap.types.did_types import AgentProfile, Service
 
 
@@ -9,13 +9,12 @@ def main():
     print("=== DIAP SDK DID Document Example ===\n")
 
     # Initialize components
-    key_manager = KeyManager()
-    did_builder = DIDBuilder(key_manager)
+    did_builder = DIDBuilder()
     did_cache = DIDCache()
 
     # Generate key pair
     print("1. Generating key pair...")
-    key_pair = key_manager.generate_key_pair()
+    key_pair = KeyManager.generate()
     print(f"   DID: {key_pair.did}")
 
     # Create agent profile
