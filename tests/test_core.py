@@ -1,0 +1,212 @@
+import pytest
+import asyncio
+from unittest.mock import Mock, AsyncMock, patch
+
+from diap import (
+    KeyManager,
+    DIDBuilder,
+    DIDCache,
+    IdentityManager,
+    NoirZKPManager,
+    ConfigManager,
+    AgentAuthManager,
+    NonceManager,
+    IPFSClient,
+)
+
+
+class TestKeyManager:
+    def test_generate_key_pair(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+
+        assert key_pair.private_key is not None
+        assert key_pair.public_key is not None
+        assert key_pair.did.startswith("did:key:")
+
+    def test_sign_and_verify(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+
+        message = b"test message"
+        signature = km.sign(key_pair, message)
+
+        assert km.verify(key_pair, message, signature)
+
+    def test_wrong_signature_fails(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+
+        message = b"test message"
+        signature = km.sign(key_pair, message)
+
+        wrong_message = b"wrong message"
+        assert not km.verify(key_pair, wrong_message, signature)
+
+
+class TestDIDBuilder:
+    def test_create_did_document(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+        builder = DIDBuilder()
+
+        doc = builder.create_did_document(key_pair)
+
+        assert doc.id == key_pair.did
+        assert len(doc.verification_method) == 1
+        assert len(doc.authentication) == 1
+
+    def test_parse_did(self):
+        builder = DIDBuilder()
+        result = builder.parse_did("did:key:z1234567890abcdef")
+
+        assert result["method"] == "key"
+        assert result["method_specific_id"] == "z1234567890abcdef"
+
+    def test_invalid_did_format(self):
+        builder = DIDBuilder()
+
+        with pytest.raises(Exception):
+            builder.parse_did("invalid:did:format")
+
+
+class TestDIDCache:
+    def test_cache_set_and_get(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+        builder = DIDBuilder()
+        doc = builder.create_did_document(key_pair)
+
+        cache = DIDCache()
+        cache.set(key_pair.did, doc)
+
+        retrieved = cache.get(key_pair.did)
+        assert retrieved is not None
+        assert retrieved.id == doc.id
+
+    def test_cache_miss(self):
+        cache = DIDCache()
+        result = cache.get("did:key:nonexistent")
+        assert result is None
+
+    def test_cache_invalidate(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+        builder = DIDBuilder()
+        doc = builder.create_did_document(key_pair)
+
+        cache = DIDCache()
+        cache.set(key_pair.did, doc)
+
+        cache.invalidate(key_pair.did)
+        assert cache.get(key_pair.did) is None
+
+
+class TestConfigManager:
+    def test_default_config(self):
+        cm = ConfigManager()
+
+        config = cm.get_sdk_config()
+        assert config.ipfs_host == "localhost"
+        assert config.ipfs_port == 5001
+
+    def test_update_config(self):
+        cm = ConfigManager()
+        cm.load()
+
+        cm.update({"ipfs_host": "newhost", "ipfs_port": 6000})
+
+        config = cm.get_sdk_config()
+        assert config.ipfs_host == "newhost"
+        assert config.ipfs_port == 6000
+
+
+class TestNonceManager:
+    @pytest.mark.asyncio
+    async def test_generate_and_verify(self):
+        nm = NonceManager()
+        await nm.start()
+
+        nonce = await nm.generate(entity_id="test-entity")
+
+        is_valid = await nm.verify(nonce, entity_id="test-entity")
+        assert is_valid
+
+        await nm.stop()
+
+    @pytest.mark.asyncio
+    async def test_consume_nonce(self):
+        nm = NonceManager()
+        await nm.start()
+
+        nonce = await nm.generate(entity_id="test-entity")
+
+        is_valid1 = await nm.verify(nonce, entity_id="test-entity", consume=True)
+        is_valid2 = await nm.verify(nonce, entity_id="test-entity")
+
+        assert is_valid1
+        assert not is_valid2
+
+        await nm.stop()
+
+    @pytest.mark.asyncio
+    async def test_entity_nonce_revocation(self):
+        nm = NonceManager()
+        await nm.start()
+
+        await nm.generate(entity_id="test-entity")
+        nonce2 = await nm.generate(entity_id="test-entity")
+
+        count = await nm.revoke_all("test-entity")
+
+        assert count == 2
+        assert not await nm.verify(nonce2, entity_id="test-entity")
+
+        await nm.stop()
+
+
+class TestAgentAuthManager:
+    def test_create_agent(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+        auth_mgr = AgentAuthManager(key_manager=km)
+
+        agent = auth_mgr.create_agent("TestAgent", key_pair)
+
+        assert agent.did == key_pair.did
+        assert agent.name == "TestAgent"
+
+    def test_duplicate_agent_fails(self):
+        km = KeyManager()
+        key_pair = km.generate_key_pair()
+        auth_mgr = AgentAuthManager(key_manager=km)
+
+        auth_mgr.create_agent("TestAgent", key_pair)
+
+        with pytest.raises(Exception):
+            auth_mgr.create_agent("TestAgent", key_pair)
+
+
+class TestIPFSClient:
+    def test_get_gateway_url(self):
+        client = IPFSClient(
+            gateway_host="gateway.example.com",
+            gateway_port=8080,
+            gateway_protocol="https",
+        )
+
+        url = client.get_gateway_url("QmABC123", "path/to/file")
+        assert "https://gateway.example.com:8080/ipfs/QmABC123/path/to/file" == url
+
+    def test_get_gateway_url_without_path(self):
+        client = IPFSClient(
+            gateway_host="gateway.example.com",
+            gateway_port=8080,
+        )
+
+        url = client.get_gateway_url("QmABC123")
+        assert "http://gateway.example.com:8080/ipfs/QmABC123" == url
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])
