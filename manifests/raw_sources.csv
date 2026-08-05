@@ -1,0 +1,4 @@
+source_id,company,vendor,kind,filename,raw_rel_path,status,compiled_into,notes
+iroh_communicator,iroh,n0-computer,code,diap/iroh_communicator.py,diap/iroh_communicator.py,compiled,docs/wiki/current-status.md,真实 iroh gossip 实现
+libp2p_communicator,libp2p,protocol-labs,code,diap/p2p/libp2p_communicator.py,diap/p2p/libp2p_communicator.py,compiled,docs/wiki/current-status.md,真实 libp2p 身份/签名 + asyncio 传输
+py_ecc_backend,py_ecc,ethereum,code,diap/zkp/py_ecc_backend.py,diap/zkp/py_ecc_backend.py,compiled,docs/wiki/current-status.md,BN128 Schnorr 知识证明

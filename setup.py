@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="diap-sdk",
-    version="0.1.3",
+    version="0.1.4",
     author="DIAP Team",
     author_email="dev@diap.ai",
     description="DIAP Python SDK - Decentralized Intelligent Agent Protocol",
@@ -29,7 +29,7 @@ setup(
         "ipfshttpclient>=0.8.0a2",
         "cryptography>=41.0.0,<49",
         "pycryptodome>=3.20.0",
-        "iroh==0.35.0",
+        "iroh==0.31.0",
         "libp2p==0.7.0",
         "pynacl>=1.6.2",
         "py_ecc>=8.0.0",

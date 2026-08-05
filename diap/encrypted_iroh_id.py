@@ -111,9 +111,19 @@ class EncryptedIrohIDManager:
             format=serialization.PublicFormat.UncompressedPoint,
         )
 
-        recipient_pub = serialization.load_elliptic_curve_public_bytes(
-            recipient_public_key, SECP256K1()
+        # recipient_public_key 是 X962 uncompressed 格式（0x04 || x || y）
+        from cryptography.hazmat.primitives.asymmetric.ec import (
+            EllipticCurvePublicNumbers,
         )
+
+        if len(recipient_public_key) == 65 and recipient_public_key[0] == 0x04:
+            rx = int.from_bytes(recipient_public_key[1:33], "big")
+            ry = int.from_bytes(recipient_public_key[33:65], "big")
+            recipient_pub = EllipticCurvePublicNumbers(
+                rx, ry, SECP256K1()
+            ).public_key(default_backend())
+        else:
+            raise CryptoError("Invalid recipient public key format")
 
         shared_secret = ephemeral_private.exchange(ECDH(), recipient_pub)
 
@@ -143,15 +153,21 @@ class EncryptedIrohIDManager:
             private_key_bytes, password=None, backend=default_backend()
         )
 
-        from cryptography.hazmat.primitives.asymmetric.ec import EllipticCurvePublicKey
-        from cryptography.hazmat.primitives.asymmetric.ec import SECP256K1
-
-        ec_pub = private_key.public_key().public_bytes(
-            encoding=serialization.Encoding.X962,
-            format=serialization.PublicFormat.UncompressedPoint,
+        from cryptography.hazmat.primitives.asymmetric.ec import (
+            EllipticCurvePublicNumbers,
+            SECP256K1,
         )
 
-        shared_secret = private_key.exchange(ECDH(), private_key.public_key())
+        if len(ephemeral_public_bytes) == 65 and ephemeral_public_bytes[0] == 0x04:
+            x = int.from_bytes(ephemeral_public_bytes[1:33], "big")
+            y = int.from_bytes(ephemeral_public_bytes[33:65], "big")
+            ephemeral_public = EllipticCurvePublicNumbers(x, y, SECP256K1()).public_key(
+                default_backend()
+            )
+        else:
+            raise CryptoError("Invalid ephemeral public key format")
+
+        shared_secret = private_key.exchange(ECDH(), ephemeral_public)
 
         key_material = sha256_hash(shared_secret)
         encryption_key = key_material[:16]
@@ -177,9 +193,19 @@ class EncryptedIrohIDManager:
             private_key, password=None, backend=default_backend()
         )
 
-        peer_public = serialization.load_elliptic_curve_public_bytes(
-            peer_public_key, SECP256K1()
+        # peer_public_key 是 X962 uncompressed 格式（0x04 || x || y）
+        from cryptography.hazmat.primitives.asymmetric.ec import (
+            EllipticCurvePublicNumbers,
         )
+
+        if len(peer_public_key) == 65 and peer_public_key[0] == 0x04:
+            px = int.from_bytes(peer_public_key[1:33], "big")
+            py = int.from_bytes(peer_public_key[33:65], "big")
+            peer_public = EllipticCurvePublicNumbers(
+                px, py, SECP256K1()
+            ).public_key(default_backend())
+        else:
+            raise CryptoError("Invalid peer public key format")
 
         shared = private.exchange(ECDH(), peer_public)
         return sha256_hash(shared)[:32]

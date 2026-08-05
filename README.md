@@ -7,11 +7,11 @@ A Python implementation of the DIAP protocol for decentralized identity manageme
 ## Features
 
 - **Decentralized Identity**: W3C DID:key implementation
-- **Zero-Knowledge Proofs**: ZKP-based authentication using snarkjs
+- **Zero-Knowledge Proofs**: Real BN128 elliptic-curve Schnorr proofs via py_ecc (snarkjs CLI as optional backend)
 - **IPFS Integration**: Decentralized storage with IPNS support
-- **P2P Networking**: Hyperswarm and Iroh communication
+- **P2P Networking**: Real iroh gossip communication + libp2p identity/signing
 - **Agent Authentication**: Secure agent identity and verification
-- **Encryption**: Ed25519 keys with AES-256-GCM encryption
+- **Encryption**: Ed25519 keys (pynacl, RFC 8032) with AES-256-GCM + ECIES encryption
 
 ## Installation
 

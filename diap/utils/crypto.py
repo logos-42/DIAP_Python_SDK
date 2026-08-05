@@ -124,3 +124,44 @@ def base58_decode(data: str) -> bytes:
     import base58
 
     return base58.b58decode(data)
+
+
+# ============================================================================
+# Ed25519 签名（pynacl，对应 TS @noble/ed25519）
+# ============================================================================
+
+
+def ed25519_sign(private_key_seed: bytes, data: bytes) -> bytes:
+    """Ed25519 签名（pynacl 实现，与 @noble/ed25519 兼容）
+
+    private_key_seed: 32 字节私钥种子（与 cryptography Raw 格式一致）
+    返回 64 字节签名
+    """
+    import nacl.signing
+
+    signing_key = nacl.signing.SigningKey(private_key_seed)
+    return signing_key.sign(data).signature
+
+
+def ed25519_verify(public_key: bytes, data: bytes, signature: bytes) -> bool:
+    """Ed25519 验签（pynacl 实现）
+
+    public_key: 32 字节公钥（与 cryptography Raw 格式一致）
+    """
+    import nacl.signing
+
+    try:
+        verify_key = nacl.signing.VerifyKey(public_key)
+        verify_key.verify(data, signature)
+        return True
+    except Exception:
+        return False
+
+
+def ed25519_keypair_from_seed(seed: bytes) -> Tuple[bytes, bytes]:
+    """从 32 字节种子派生 Ed25519 公私钥对（pynacl）"""
+    import nacl.signing
+
+    signing_key = nacl.signing.SigningKey(seed)
+    public_key = bytes(signing_key.verify_key)
+    return seed, public_key

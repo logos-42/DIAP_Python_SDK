@@ -1,3 +1,4 @@
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from enum import Enum
@@ -12,11 +13,12 @@ logger = get_logger(__name__)
 class ZKPBackendType(Enum):
     SNARKJS = "snarkjs"
     SIMPLIFIED = "simplified"
+    PYECC = "py_ecc"
     NOIR = "noir"
 
 
 class UniversalZKManager:
-    def __init__(self, default_backend: str = "snarkjs"):
+    def __init__(self, default_backend: str = "py_ecc"):
         self.default_backend = default_backend
         self._backends: Dict[str, Any] = {}
         self._current_backend = default_backend
@@ -30,9 +32,12 @@ class UniversalZKManager:
                 self._backends["snarkjs"] = SnarkJSBackend()
                 logger.info("Initialized SnarkJS backend")
             except ImportError as e:
-                logger.warning(f"Failed to init SnarkJS: {e}, using simplified")
-                self._backends["simplified"] = SimplifiedBackend()
-                self._current_backend = "simplified"
+                logger.warning(f"Failed to init SnarkJS: {e}, using py_ecc")
+                self._backends["py_ecc"] = PyEccBackend()
+                self._current_backend = "py_ecc"
+        elif self.default_backend == "py_ecc":
+            self._backends["py_ecc"] = PyEccBackend()
+            logger.info("Initialized PyEcc (BN128 Schnorr) backend")
         else:
             self._backends[self.default_backend] = SimplifiedBackend()
 
@@ -48,6 +53,8 @@ class UniversalZKManager:
                 from .snarkjs_backend import SnarkJSBackend
 
                 self._backends["snarkjs"] = SnarkJSBackend()
+            elif backend_name == "py_ecc":
+                self._backends["py_ecc"] = PyEccBackend()
             else:
                 raise ZKPError(f"Unknown backend: {backend_name}")
 
@@ -64,6 +71,15 @@ class UniversalZKManager:
                 public_inputs=result.public_inputs,
                 circuit_hash="",
                 timestamp=result.timestamp,
+            )
+
+        if isinstance(result, dict):
+            # py_ecc 后端返回 JSON 结构
+            return ProofResult(
+                proof=json.dumps(result).encode(),
+                public_inputs=result.get("public_binding", "").encode(),
+                circuit_hash=result.get("format", "bn128_schnorr"),
+                timestamp=datetime.utcnow().isoformat() + "Z",
             )
 
         return result
@@ -97,6 +113,8 @@ class UniversalZKManager:
 
 
 class SimplifiedBackend:
+    """简化后端（测试/回退用，使用哈希模拟）"""
+
     def generate_proof(self, inputs: Dict[str, Any]) -> ProofResult:
         import hashlib
 
@@ -128,4 +146,5 @@ class SimplifiedBackend:
         return True  # 简化后端总是可用
 
 
-import json
+# 延迟导入避免循环依赖（PyEccBackend 需要 types，不依赖本模块）
+from .py_ecc_backend import PyEccBackend  # noqa: E402

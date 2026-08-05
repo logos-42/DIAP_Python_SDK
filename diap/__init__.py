@@ -127,6 +127,7 @@ from .zkp import (
     UniversalZKManager,
     ZKPBackendType,
     SimplifiedBackend,
+    PyEccBackend,
     ZKPKeyPair,
     KeyGenerationResult,
     generate_simple_zkp_keys,
@@ -135,7 +136,7 @@ from .zkp import (
     create_zkp_keys,
 )
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 
 __all__ = [
     "KeyManager",
@@ -241,6 +242,7 @@ __all__ = [
     "UniversalZKManager",
     "ZKPBackendType",
     "SimplifiedBackend",
+    "PyEccBackend",
     "ZKPKeyPair",
     "KeyGenerationResult",
     "generate_simple_zkp_keys",

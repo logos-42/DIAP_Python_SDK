@@ -30,16 +30,27 @@ class KeyGenerationResult:
 
 
 def generate_simple_zkp_keys() -> ZKPKeyPair:
-    """生成简化的 ZKP 密钥对
-    这是一个演示版本的密钥生成，实际生产环境应使用更安全的可信设置
+    """生成真实的椭圆曲线 ZKP 密钥对（BN128 曲线）
+
+    使用 py_ecc 生成真实的 proving key（随机标量）和 verification key（公钥点）。
     """
-    logger.info("🔧 生成简化的 ZKP 密钥对...")
-    logger.warning("⚠️  这是演示版本，生产环境需要更安全的可信设置")
+    logger.info("🔧 生成 BN128 椭圆曲线 ZKP 密钥对...")
 
-    proving_key = b"DIAP_PROVING_KEY_V1_DEMO"
-    verification_key = b"DIAP_VERIFICATION_KEY_V1_DEMO"
+    from py_ecc.bn128 import G1, multiply, curve_order
+    import secrets
 
-    logger.info("✅ ZKP 密钥对生成完成")
+    # proving key: 随机标量（witness 生成种子）
+    proving_scalar = secrets.randbelow(curve_order - 1) + 1
+    # verification key: 公钥点 X = scalar·G
+    verification_point = multiply(G1, proving_scalar)
+
+    proving_key = proving_scalar.to_bytes(32, "big")
+    verification_key = (
+        int(verification_point[0]).to_bytes(32, "big")
+        + int(verification_point[1]).to_bytes(32, "big")
+    )
+
+    logger.info("✅ BN128 ZKP 密钥对生成完成")
 
     return ZKPKeyPair(
         proving_key=proving_key,

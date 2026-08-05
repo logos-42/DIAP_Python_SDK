@@ -1,5 +1,6 @@
 from .snarkjs_backend import SnarkJSBackend
 from .universal_manager import UniversalZKManager, ZKPBackendType, SimplifiedBackend
+from .py_ecc_backend import PyEccBackend
 from .key_generator import (
     ZKPKeyPair,
     KeyGenerationResult,
@@ -14,6 +15,7 @@ __all__ = [
     "UniversalZKManager",
     "ZKPBackendType",
     "SimplifiedBackend",
+    "PyEccBackend",
     "ZKPKeyPair",
     "KeyGenerationResult",
     "generate_simple_zkp_keys",
