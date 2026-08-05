@@ -23,9 +23,11 @@ def sha256_hash(data: bytes) -> bytes:
 
 
 def keccak_hash(data: bytes) -> bytes:
-    import sha3
+    from Crypto.Hash import keccak
 
-    return sha3.keccak_256(data).digest()
+    hasher = keccak.new(digest_bits=256)
+    hasher.update(data)
+    return hasher.digest()
 
 
 def hmac_sha256(key: bytes, data: bytes) -> bytes:
