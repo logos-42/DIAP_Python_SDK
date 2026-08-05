@@ -2,7 +2,7 @@
 
 > **Decentralized Intelligent Agent Protocol** — Python implementation.
 >
-> 中文说明：DIAP（去中心化智能体协议）的 Python SDK，与 TypeScript / Rust 版本协议对齐。核心能力：去中心化身份（DID）、零知识证明（ZKP）、P2P 通信、IPFS 存储。安装与示例见下文英文文档。
+> 中文版说明：[README.zh-CN.md](./README.zh-CN.md) — 完整中文文档，含 ZKP 证明原理说明。
 
 [![PyPI version](https://img.shields.io/pypi/v/diap-sdk.svg)](https://pypi.org/project/diap-sdk/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
