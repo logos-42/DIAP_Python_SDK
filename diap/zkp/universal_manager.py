@@ -123,5 +123,9 @@ class SimplifiedBackend:
     def get_circuit_hash(self) -> str:
         return "simplified_v1"
 
+    def is_available(self) -> bool:
+        """检查后端是否可用"""
+        return True  # 简化后端总是可用
+
 
 import json

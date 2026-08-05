@@ -17,7 +17,29 @@ from .noir_zkp import NoirZKPManager
 
 from .ipfs_client import IPFSClient, MultiAddrIPFSClient
 
+from .memory_ipfs_client import MemoryIpfsClient, IpfsUploadResult
+
 from .ipfs_node_manager import IPFSNodeManager
+
+from .ipfs_multi_publisher import (
+    IpfsMultiPublisher,
+    MultiNodePublishResult,
+    IpfsNodeConfig,
+    GatewayCredentials,
+    create_multi_publisher,
+    create_pinata_publisher,
+    create_infura_publisher,
+    create_web3_storage_publisher,
+    create_custom_publisher,
+    is_kubo_installed,
+)
+
+from .ipfs_setup import (
+    check_kubo_setup,
+    start_local_kubo,
+    ensure_local_ipfs_node,
+    KuboSetupResult,
+)
 
 from .ipns_manager import IPNSManager
 
@@ -68,6 +90,11 @@ from .p2p import (
     P2PConnection,
     P2PNodeAddr,
     P2PMessage,
+    Libp2pCommunicator,
+    Libp2pConfig,
+    Libp2pMessage,
+    Libp2pConnection,
+    create_libp2p_communicator,
 )
 
 from .types import (
@@ -95,7 +122,20 @@ from .types import (
     CryptoError,
 )
 
-__version__ = "0.1.2"
+from .zkp import (
+    SnarkJSBackend,
+    UniversalZKManager,
+    ZKPBackendType,
+    SimplifiedBackend,
+    ZKPKeyPair,
+    KeyGenerationResult,
+    generate_simple_zkp_keys,
+    ensure_zkp_keys_exist,
+    generate_noir_keys,
+    create_zkp_keys,
+)
+
+__version__ = "0.1.3"
 
 __all__ = [
     "KeyManager",
@@ -115,7 +155,23 @@ __all__ = [
     "NoirZKPManager",
     "IPFSClient",
     "MultiAddrIPFSClient",
+    "MemoryIpfsClient",
+    "IpfsUploadResult",
     "IPFSNodeManager",
+    "IpfsMultiPublisher",
+    "MultiNodePublishResult",
+    "IpfsNodeConfig",
+    "GatewayCredentials",
+    "create_multi_publisher",
+    "create_pinata_publisher",
+    "create_infura_publisher",
+    "create_web3_storage_publisher",
+    "create_custom_publisher",
+    "is_kubo_installed",
+    "check_kubo_setup",
+    "start_local_kubo",
+    "ensure_local_ipfs_node",
+    "KuboSetupResult",
     "IPNSManager",
     "KuboInstaller",
     "AgentAuthManager",
@@ -154,6 +210,11 @@ __all__ = [
     "P2PConnection",
     "P2PNodeAddr",
     "P2PMessage",
+    "Libp2pCommunicator",
+    "Libp2pConfig",
+    "Libp2pMessage",
+    "Libp2pConnection",
+    "create_libp2p_communicator",
     "KeyPair",
     "KeyBackup",
     "KeyStoreConfig",
@@ -176,4 +237,14 @@ __all__ = [
     "IPNSError",
     "AgentAuthError",
     "CryptoError",
+    "SnarkJSBackend",
+    "UniversalZKManager",
+    "ZKPBackendType",
+    "SimplifiedBackend",
+    "ZKPKeyPair",
+    "KeyGenerationResult",
+    "generate_simple_zkp_keys",
+    "ensure_zkp_keys_exist",
+    "generate_noir_keys",
+    "create_zkp_keys",
 ]
